@@ -13,3 +13,14 @@ def get_all_establishments(request):
             establishments, many=True)
         return Response(serializer.data)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_establishment_by_id(request, id):
+    if request.method == 'GET':
+        try:
+            establishment = Commercial_Establishment.objects.get(pk=id)
+        except Commercial_Establishment.DoesNotExist:
+            return Response({'error': 'Establishment not found'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = CommercialEstablishmentSerializer(establishment)
+    return Response(serializer.data)
