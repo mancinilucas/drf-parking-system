@@ -5,13 +5,21 @@ from .models import Commercial_Establishment, Vehicle
 from .serializers import CommercialEstablishmentSerializer, VehicleSerializer
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def get_all_establishments(request):
     if request.method == 'GET':
         establishments = Commercial_Establishment.objects.all()
         serializer = CommercialEstablishmentSerializer(
             establishments, many=True)
         return Response(serializer.data)
+
+    if request.method == 'POST':
+        establishment_serializer = CommercialEstablishmentSerializer(
+            data=request.data)
+        if establishment_serializer.is_valid():
+            establishment_serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response({'error': 'Establishment not created'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
