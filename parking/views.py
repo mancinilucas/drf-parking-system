@@ -45,3 +45,45 @@ def establishment_manager(request, id):
     elif request.method == 'DELETE':
         establishment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET', 'POST'])
+def get_vehicles(request):
+    if request.method == 'GET':
+        vehicles = Vehicle.objects.all()
+        serializer = VehicleSerializer(
+            vehicles, many=True)
+        return Response(serializer.data)
+
+    if request.method == 'POST':
+        vehicle_serializer = VehicleSerializer(
+            data=request.data)
+        if vehicle_serializer.is_valid():
+            vehicle_serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response({'error': 'Vehicle not created'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def vehicle_manager(request, id):
+    try:
+        vehicle = Vehicle.objects.get(pk=id)
+    except Vehicle.DoesNotExist:
+        return Response({'error': 'Vehicle not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        vehicle_serializer = VehicleSerializer(
+            vehicle)
+        return Response(vehicle_serializer.data)
+
+    elif request.method == 'PUT':
+        vehicle_serializer = VehicleSerializer(
+            vehicle, data=request.data)
+        if vehicle_serializer.is_valid():
+            vehicle_serializer.save()
+            return Response(vehicle_serializer.data)
+        return Response({'error': 'Vehicle not updated'}, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        vehicle.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
